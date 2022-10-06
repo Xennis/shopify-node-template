@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
+import {ReactNode, useMemo, useState} from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Provider } from "@shopify/app-bridge-react";
 import { Banner, Layout, Page } from "@shopify/polaris";
+import { AppConfigV2 } from "@shopify/app-bridge";
 
 /**
  * A component to configure App Bridge.
@@ -12,12 +13,12 @@ import { Banner, Layout, Page } from "@shopify/polaris";
  *
  * See: https://shopify.dev/apps/tools/app-bridge/react-components
  */
-export function AppBridgeProvider({ children }) {
+export function AppBridgeProvider({ children }: {children?: ReactNode}) {
   const location = useLocation();
   const navigate = useNavigate();
   const history = useMemo(
     () => ({
-      replace: (path) => {
+      replace: (path: string) => {
         navigate(path, { replace: true });
       },
     }),
@@ -34,7 +35,7 @@ export function AppBridgeProvider({ children }) {
   // During the lifecycle of an app, these values should never be updated anyway.
   // Using state in this way is preferable to useMemo.
   // See: https://stackoverflow.com/questions/60482318/version-of-usememo-for-caching-a-value-that-will-never-change
-  const [appBridgeConfig] = useState(() => {
+  const [appBridgeConfig] = useState((): AppConfigV2 => {
     const host =
       new URLSearchParams(location.search).get("host") ||
       window.__SHOPIFY_DEV_HOST;
@@ -43,7 +44,7 @@ export function AppBridgeProvider({ children }) {
 
     return {
       host,
-      apiKey: process.env.SHOPIFY_API_KEY,
+      apiKey: process.env.SHOPIFY_API_KEY!,
       forceRedirect: true,
     };
   });
