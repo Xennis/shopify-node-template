@@ -1,5 +1,9 @@
 lockfileVersion: 5.4
 
+overrides:
+  '@types/react': ^17.0.39
+  '@types/react-dom': ^17.0.11
+
 specifiers:
   '@shopify/app-bridge': ^3.3.2
   '@shopify/app-bridge-react': ^3.3.2
@@ -413,8 +417,8 @@ packages:
     dependencies:
       '@shopify/polaris-icons': 5.4.0
       '@shopify/polaris-tokens': 5.5.2
-      '@types/react': 18.0.21
-      '@types/react-dom': 18.0.6
+      '@types/react': 17.0.50
+      '@types/react-dom': 17.0.17
       '@types/react-transition-group': 4.4.5
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
@@ -434,18 +438,11 @@ packages:
     resolution: {integrity: sha512-VjnqEmqGnasQKV0CWLevqMTXBYG9GbwuE6x3VetERLh0cq2LTptFE73MrQi2S7GkKXCf2GgwItB/melLnxfnsg==}
     dependencies:
       '@types/react': 17.0.50
-    dev: true
-
-  /@types/react-dom/18.0.6:
-    resolution: {integrity: sha512-/5OFZgfIPSwy+YuIBP/FgJnQnsxhZhjjrnxudMddeblOouIodEQ75X14Rr4wGSG/bknL+Omy9iWlLo1u/9GzAA==}
-    dependencies:
-      '@types/react': 18.0.21
-    dev: false
 
   /@types/react-transition-group/4.4.5:
     resolution: {integrity: sha512-juKD/eiSM3/xZYzjuzH6ZwpP+/lejltmiS3QEzV/vmb/Q8+HfDmxu+Baga8UEMGBqV88Nbg4l2hY/K2DkyaLLA==}
     dependencies:
-      '@types/react': 18.0.21
+      '@types/react': 17.0.50
     dev: false
 
   /@types/react/17.0.50:
@@ -454,15 +451,6 @@ packages:
       '@types/prop-types': 15.7.5
       '@types/scheduler': 0.16.2
       csstype: 3.1.1
-    dev: true
-
-  /@types/react/18.0.21:
-    resolution: {integrity: sha512-7QUCOxvFgnD5Jk8ZKlUAhVcRj7GuJRjnjjiY/IUBWKgOlnvDvTMLD4RTF7NPyVmbRhNrbomZiOepg7M/2Kj1mA==}
-    dependencies:
-      '@types/prop-types': 15.7.5
-      '@types/scheduler': 0.16.2
-      csstype: 3.1.1
-    dev: false
 
   /@types/scheduler/0.16.2:
     resolution: {integrity: sha512-hppQEBDmlwhFAXKJX2KnWLYu5yMfi91yazPb2l+lbJiwW+wdo1gNeRA+3RgNSO39WYX2euey41KEwnqesU2Jew==}

@@ -6,7 +6,7 @@ import { Routes as ReactRouterRoutes, Route } from "react-router-dom";
  * To create a new route create a new .jsx file in `/pages` with a default export.
  *
  * Some examples:
- * * `/pages/index.jsx` matches `/`
+ * * `/pages/index.tsx` matches `/`
  * * `/pages/blog/[id].jsx` matches `/blog/123`
  * * `/pages/[...catchAll].jsx` matches any URL not explicitly matched
  *
@@ -14,13 +14,13 @@ import { Routes as ReactRouterRoutes, Route } from "react-router-dom";
  *
  * @return {Routes} `<Routes/>` from React Router, with a `<Route/>` for each file in `pages`
  */
-export default function Routes({ pages }) {
+export default function Routes({ pages }: {pages: any}): JSX.Element {
   const routes = useRoutes(pages);
   const routeComponents = routes.map(({ path, component: Component }) => (
     <Route key={path} path={path} element={<Component />} />
   ));
 
-  const NotFound = routes.find(({ path }) => path === "/notFound").component;
+  const NotFound = routes.find(({ path }) => path === "/notFound")!.component;
 
   return (
     <ReactRouterRoutes>
@@ -30,7 +30,7 @@ export default function Routes({ pages }) {
   );
 }
 
-function useRoutes(pages) {
+function useRoutes(pages: any) {
   const routes = Object.keys(pages)
     .map((key) => {
       let path = key
