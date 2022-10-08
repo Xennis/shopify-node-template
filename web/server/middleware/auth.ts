@@ -1,28 +1,34 @@
-import { Shopify } from "@shopify/shopify-api";
+import {BillingSettings, Shopify} from "@shopify/shopify-api";
 import { gdprTopics } from "@shopify/shopify-api/dist/webhooks/registry.js";
+import { Request, Response, Application} from "express";
 
-import ensureBilling from "../helpers/ensure-billing.js";
-import redirectToAuth from "../helpers/redirect-to-auth.js";
+import ensureBilling from "../helpers/ensure-billing";
+import redirectToAuth from "../helpers/redirect-to-auth";
 
 export default function applyAuthMiddleware(
-  app,
-  { billing = { required: false } } = { billing: { required: false } }
+  app: Application,
+  { billing }: {billing: BillingSettings & {required: boolean}}
 ) {
-  app.get("/api/auth", async (req, res) => {
+  app.get("/api/auth", async (req: Request, res: Response) => {
     return redirectToAuth(req, res, app)
   });
 
-  app.get("/api/auth/callback", async (req, res) => {
+  app.get("/api/auth/callback", async (req: Request, res: Response) => {
     try {
       const session = await Shopify.Auth.validateAuthCallback(
         req,
         res,
-        req.query
+        req.query as {
+          shop: string;
+          code: string;
+          timestamp: string;
+          state: string;
+        }
       );
 
       const responses = await Shopify.Webhooks.Registry.registerAll({
         shop: session.shop,
-        accessToken: session.accessToken,
+        accessToken: session.accessToken as string,
       });
 
       Object.entries(responses).map(([topic, response]) => {
@@ -31,6 +37,7 @@ export default function applyAuthMiddleware(
         // 'GDPR mandatory webhooks' section of 'App setup' in the Partners Dashboard.
         if (!response.success && !gdprTopics.includes(topic)) {
           console.log(
+              // @ts-ignore
             `Failed to register ${topic} webhook: ${response.result.errors[0].message}`
           );
         }
@@ -40,7 +47,7 @@ export default function applyAuthMiddleware(
       if (billing.required) {
         const [hasPayment, confirmationUrl] = await ensureBilling(
           session,
-          billing
+            billing
         );
 
         if (!hasPayment) {
@@ -48,10 +55,10 @@ export default function applyAuthMiddleware(
         }
       }
 
-      const host = Shopify.Utils.sanitizeHost(req.query.host);
+      const host = Shopify.Utils.sanitizeHost(`${req.query.host}`);
       const redirectUrl = Shopify.Context.IS_EMBEDDED_APP
         ? Shopify.Utils.getEmbeddedAppUrl(req)
-        : `/?shop=${session.shop}&host=${encodeURIComponent(host)}`;
+        : `/?shop=${session.shop}&host=${encodeURIComponent(host || '')}`;
 
       res.redirect(redirectUrl);
     } catch (e) {
@@ -59,7 +66,7 @@ export default function applyAuthMiddleware(
       switch (true) {
         case e instanceof Shopify.Errors.InvalidOAuthError:
           res.status(400);
-          res.send(e.message);
+          res.send((e as any).message);
           break;
         case e instanceof Shopify.Errors.CookieNotFound:
         case e instanceof Shopify.Errors.SessionNotFound:
@@ -68,7 +75,7 @@ export default function applyAuthMiddleware(
           break;
         default:
           res.status(500);
-          res.send(e.message);
+          res.send((e as any).message);
           break;
       }
     }

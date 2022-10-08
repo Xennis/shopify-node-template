@@ -1,10 +1,10 @@
 import { Shopify } from "@shopify/shopify-api";
-import ensureBilling, {
-  ShopifyBillingError,
-} from "../helpers/ensure-billing.js";
-import redirectToAuth from "../helpers/redirect-to-auth.js";
+import ensureBilling from "../helpers/ensure-billing";
+import redirectToAuth from "../helpers/redirect-to-auth";
 
-import returnTopLevelRedirection from "../helpers/return-top-level-redirection.js";
+import returnTopLevelRedirection from "../helpers/return-top-level-redirection";
+import {NextFunction, Request, Response, Application} from "express";
+import {BillingError} from "@shopify/shopify-api/dist/error";
 
 const TEST_GRAPHQL_QUERY = `
 {
@@ -14,17 +14,17 @@ const TEST_GRAPHQL_QUERY = `
 }`;
 
 export default function verifyRequest(
-  app,
-  { billing = { required: false } } = { billing: { required: false } }
+  app: Application,
+  { billing = { required: false } }
 ) {
-  return async (req, res, next) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
     const session = await Shopify.Utils.loadCurrentSession(
       req,
       res,
       app.get("use-online-tokens")
     );
 
-    let shop = Shopify.Utils.sanitizeShop(req.query.shop);
+    let shop = Shopify.Utils.sanitizeShop(req.query.shop as string);
     if (session && shop && session.shop !== shop) {
       // The current request is for a different shop. Redirect gracefully.
       return redirectToAuth(req, res, app);
@@ -34,9 +34,11 @@ export default function verifyRequest(
       try {
         if (billing.required) {
           // The request to check billing status serves to validate that the access token is still valid.
+
           const [hasPayment, confirmationUrl] = await ensureBilling(
             session,
-            billing
+              // @ts-ignore
+              billing
           );
 
           if (!hasPayment) {
@@ -58,7 +60,7 @@ export default function verifyRequest(
           e.response.code === 401
         ) {
           // Re-authenticate if we get a 401 response
-        } else if (e instanceof ShopifyBillingError) {
+        } else if (e instanceof BillingError) {
           console.error(e.message, e.errorData[0]);
           res.status(500).end();
           return;
@@ -85,6 +87,7 @@ export default function verifyRequest(
     returnTopLevelRedirection(
       req,
       res,
+        // @ts-ignore
       `/api/auth?shop=${encodeURIComponent(shop)}`
     );
   };
