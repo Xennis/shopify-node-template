@@ -1,21 +1,21 @@
-// @ts-check
 import { join } from "path";
 import { readFileSync } from "fs";
-import express from "express";
-import cookieParser from "cookie-parser";
-import { Shopify, LATEST_API_VERSION } from "@shopify/shopify-api";
+// https://stackoverflow.com/a/65376049
+import * as express from "express";
+// https://stackoverflow.com/a/65376049
+import * as cookieParser from "cookie-parser";
+import {Shopify, LATEST_API_VERSION, BillingInterval, SessionInterface} from "@shopify/shopify-api";
 
-import applyAuthMiddleware from "./middleware/auth.js";
-import verifyRequest from "./middleware/verify-request.js";
-import { setupGDPRWebHooks } from "./gdpr.js";
-import productCreator from "./helpers/product-creator.js";
-import redirectToAuth from "./helpers/redirect-to-auth.js";
-import { BillingInterval } from "./helpers/ensure-billing.js";
-import { AppInstallations } from "./app_installations.js";
+import applyAuthMiddleware from "./middleware/auth";
+import verifyRequest from "./middleware/verify-request";
+import { setupGDPRWebHooks } from "./gdpr";
+import productCreator from "./helpers/product-creator";
+import redirectToAuth from "./helpers/redirect-to-auth";
+import { AppInstallations } from "./app_installations";
 
 const USE_ONLINE_TOKENS = false;
 
-const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
+const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT || '8810', 10);
 
 // TODO: There should be provided by env vars
 const DEV_INDEX_PATH = `${process.cwd()}/../frontend/`;
@@ -24,11 +24,11 @@ const PROD_INDEX_PATH = `${process.cwd()}/../frontend/dist/`;
 const DB_PATH = `${process.cwd()}/database.sqlite`;
 
 Shopify.Context.initialize({
-  API_KEY: process.env.SHOPIFY_API_KEY,
-  API_SECRET_KEY: process.env.SHOPIFY_API_SECRET,
-  SCOPES: process.env.SCOPES.split(","),
-  HOST_NAME: process.env.HOST.replace(/https?:\/\//, ""),
-  HOST_SCHEME: process.env.HOST.split("://")[0],
+  API_KEY: process.env.SHOPIFY_API_KEY as string,
+  API_SECRET_KEY: process.env.SHOPIFY_API_SECRET as string,
+  SCOPES: (process.env.SCOPES as string).split(","),
+  HOST_NAME: (process.env.HOST as string).replace(/https?:\/\//, ""),
+  HOST_SCHEME: (process.env.HOST as string).split("://")[0],
   API_VERSION: LATEST_API_VERSION,
   IS_EMBEDDED_APP: true,
   // This should be replaced with your preferred storage strategy
@@ -47,10 +47,10 @@ Shopify.Webhooks.Registry.addHandler("APP_UNINSTALLED", {
 const BILLING_SETTINGS = {
   required: false,
   // This is an example configuration that would do a one-time charge for $5 (only USD is currently supported)
-  // chargeName: "My Shopify One-Time Charge",
-  // amount: 5.0,
-  // currencyCode: "USD",
-  // interval: BillingInterval.OneTime,
+  chargeName: "My Shopify One-Time Charge",
+  amount: 5.0,
+  currencyCode: "USD",
+  interval: BillingInterval.OneTime,
 };
 
 // This sets up the mandatory GDPR webhooks. You’ll need to fill in the endpoint
@@ -85,9 +85,12 @@ export async function createServer(
       await Shopify.Webhooks.Registry.process(req, res);
       console.log(`Webhook processed, returned status code 200`);
     } catch (e) {
-      console.log(`Failed to process webhook: ${e.message}`);
+      let message
+      if (e instanceof Error) message = e.message
+      else message = String(e)
+      console.log(`Failed to process webhook: ${message}`);
       if (!res.headersSent) {
-        res.status(500).send(e.message);
+        res.status(500).send(message);
       }
     }
   });
@@ -115,7 +118,8 @@ export async function createServer(
   });
 
   app.get("/api/products/create", async (req, res) => {
-    const session = await Shopify.Utils.loadCurrentSession(
+    // @ts-ignore
+    const session: SessionInterface = await Shopify.Utils.loadCurrentSession(
       req,
       res,
       app.get("use-online-tokens")
@@ -126,9 +130,12 @@ export async function createServer(
     try {
       await productCreator(session);
     } catch (e) {
-      console.log(`Failed to process products/create: ${e.message}`);
+      let message
+      if (e instanceof Error) message = e.message
+      else message = String(e)
+      console.log(`Failed to process products/create: ${message}`);
       status = 500;
-      error = e.message;
+      error = message;
     }
     res.status(status).send({ success: status === 200, error });
   });
@@ -138,7 +145,7 @@ export async function createServer(
   app.use(express.json());
 
   app.use((req, res, next) => {
-    const shop = Shopify.Utils.sanitizeShop(req.query.shop);
+    const shop = Shopify.Utils.sanitizeShop(req.query.shop as string);
     if (Shopify.Context.IS_EMBEDDED_APP && shop) {
       res.setHeader(
         "Content-Security-Policy",
@@ -170,7 +177,8 @@ export async function createServer(
       return res.send("No shop provided");
     }
 
-    const shop = Shopify.Utils.sanitizeShop(req.query.shop);
+    // @ts-ignore
+    const shop: string = Shopify.Utils.sanitizeShop(req.query.shop as string);
     const appInstalled = await AppInstallations.includes(shop);
 
     if (!appInstalled) {
