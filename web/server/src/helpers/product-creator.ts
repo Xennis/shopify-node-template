@@ -1,4 +1,4 @@
-import {SessionInterface, Shopify} from "@shopify/shopify-api";
+import { SessionInterface, Shopify } from "@shopify/shopify-api";
 
 const ADJECTIVES = [
   "autumn",
@@ -32,7 +32,7 @@ const ADJECTIVES = [
   "frosty",
   "green",
   "long",
-]
+];
 
 const NOUNS = [
   "waterfall",
@@ -66,7 +66,7 @@ const NOUNS = [
   "field",
   "fire",
   "flower",
-]
+];
 
 export const DEFAULT_PRODUCTS_COUNT = 5;
 const CREATE_PRODUCTS_MUTATION = `
@@ -77,9 +77,12 @@ const CREATE_PRODUCTS_MUTATION = `
       }
     }
   }
-`
+`;
 
-export default async function productCreator(session: SessionInterface, count: number = DEFAULT_PRODUCTS_COUNT) {
+export default async function productCreator(
+  session: SessionInterface,
+  count: number = DEFAULT_PRODUCTS_COUNT
+) {
   const client = new Shopify.Clients.Graphql(session.shop, session.accessToken);
 
   try {
@@ -98,7 +101,9 @@ export default async function productCreator(session: SessionInterface, count: n
     }
   } catch (error) {
     if (error instanceof Shopify.Errors.GraphqlQueryError) {
-      throw new Error(`${error.message}\n${JSON.stringify(error.response, null, 2)}`);
+      throw new Error(
+        `${error.message}\n${JSON.stringify(error.response, null, 2)}`
+      );
     } else {
       throw error;
     }

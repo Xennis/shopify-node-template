@@ -4,7 +4,12 @@ import { readFileSync } from "fs";
 import * as express from "express";
 // https://stackoverflow.com/a/65376049
 import * as cookieParser from "cookie-parser";
-import {Shopify, LATEST_API_VERSION, BillingInterval, SessionInterface} from "@shopify/shopify-api";
+import {
+  Shopify,
+  LATEST_API_VERSION,
+  BillingInterval,
+  SessionInterface,
+} from "@shopify/shopify-api";
 
 import applyAuthMiddleware from "./middleware/auth";
 import verifyRequest from "./middleware/verify-request";
@@ -15,7 +20,10 @@ import { AppInstallations } from "./app_installations";
 
 const USE_ONLINE_TOKENS = false;
 
-const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT || '8810', 10);
+const PORT = parseInt(
+  process.env.BACKEND_PORT || process.env.PORT || "8810",
+  10
+);
 
 // TODO: There should be provided by env vars
 const DEV_INDEX_PATH = `${process.cwd()}/../frontend/`;
@@ -85,9 +93,9 @@ export async function createServer(
       await Shopify.Webhooks.Registry.process(req, res);
       console.log(`Webhook processed, returned status code 200`);
     } catch (e) {
-      let message
-      if (e instanceof Error) message = e.message
-      else message = String(e)
+      let message;
+      if (e instanceof Error) message = e.message;
+      else message = String(e);
       console.log(`Failed to process webhook: ${message}`);
       if (!res.headersSent) {
         res.status(500).send(message);
@@ -130,9 +138,9 @@ export async function createServer(
     try {
       await productCreator(session);
     } catch (e) {
-      let message
-      if (e instanceof Error) message = e.message
-      else message = String(e)
+      let message;
+      if (e instanceof Error) message = e.message;
+      else message = String(e);
       console.log(`Failed to process products/create: ${message}`);
       status = 500;
       error = message;
@@ -171,7 +179,6 @@ export async function createServer(
   }
 
   app.use("/*", async (req, res, next) => {
-
     if (typeof req.query.shop !== "string") {
       res.status(500);
       return res.send("No shop provided");

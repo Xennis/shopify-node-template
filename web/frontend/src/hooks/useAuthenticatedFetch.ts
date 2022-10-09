@@ -15,7 +15,10 @@ import { ClientApplication, AppBridgeState } from "@shopify/app-bridge";
  *
  * @returns {Function} fetch function
  */
-export function useAuthenticatedFetch(): (uri: RequestInfo, options?: RequestInit) => Promise<Response> {
+export function useAuthenticatedFetch(): (
+  uri: RequestInfo,
+  options?: RequestInit
+) => Promise<Response> {
   const app = useAppBridge();
   const fetchFunction = authenticatedFetch(app);
 
@@ -26,7 +29,10 @@ export function useAuthenticatedFetch(): (uri: RequestInfo, options?: RequestIni
   };
 }
 
-function checkHeadersForReauthorization(headers: Headers, app: ClientApplication<AppBridgeState>) {
+function checkHeadersForReauthorization(
+  headers: Headers,
+  app: ClientApplication<AppBridgeState>
+) {
   if (headers.get("X-Shopify-API-Request-Failure-Reauthorize") === "1") {
     const authUrlHeader =
       headers.get("X-Shopify-API-Request-Failure-Reauthorize-Url") ||
