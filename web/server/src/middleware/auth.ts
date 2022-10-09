@@ -1,16 +1,16 @@
-import {BillingSettings, Shopify} from "@shopify/shopify-api";
+import { BillingSettings, Shopify } from "@shopify/shopify-api";
 import { gdprTopics } from "@shopify/shopify-api/dist/webhooks/registry.js";
-import { Request, Response, Application} from "express";
+import { Request, Response, Application } from "express";
 
 import ensureBilling from "../helpers/ensure-billing";
 import redirectToAuth from "../helpers/redirect-to-auth";
 
 export default function applyAuthMiddleware(
   app: Application,
-  { billing }: {billing: BillingSettings & {required: boolean}}
+  { billing }: { billing: BillingSettings & { required: boolean } }
 ) {
   app.get("/api/auth", async (req: Request, res: Response) => {
-    return redirectToAuth(req, res, app)
+    return redirectToAuth(req, res, app);
   });
 
   app.get("/api/auth/callback", async (req: Request, res: Response) => {
@@ -37,7 +37,7 @@ export default function applyAuthMiddleware(
         // 'GDPR mandatory webhooks' section of 'App setup' in the Partners Dashboard.
         if (!response.success && !gdprTopics.includes(topic)) {
           console.log(
-              // @ts-ignore
+            // @ts-ignore
             `Failed to register ${topic} webhook: ${response.result.errors[0].message}`
           );
         }
@@ -47,7 +47,7 @@ export default function applyAuthMiddleware(
       if (billing.required) {
         const [hasPayment, confirmationUrl] = await ensureBilling(
           session,
-            billing
+          billing
         );
 
         if (!hasPayment) {
@@ -58,7 +58,7 @@ export default function applyAuthMiddleware(
       const host = Shopify.Utils.sanitizeHost(`${req.query.host}`);
       const redirectUrl = Shopify.Context.IS_EMBEDDED_APP
         ? Shopify.Utils.getEmbeddedAppUrl(req)
-        : `/?shop=${session.shop}&host=${encodeURIComponent(host || '')}`;
+        : `/?shop=${session.shop}&host=${encodeURIComponent(host || "")}`;
 
       res.redirect(redirectUrl);
     } catch (e) {

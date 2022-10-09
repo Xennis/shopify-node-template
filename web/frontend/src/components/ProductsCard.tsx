@@ -10,7 +10,7 @@ import { Toast } from "@shopify/app-bridge-react";
 import { useAppQuery, useAuthenticatedFetch } from "../hooks";
 
 export function ProductsCard() {
-  const emptyToastProps: {content: string, error?: boolean} = { content: "" };
+  const emptyToastProps: { content: string; error?: boolean } = { content: "" };
   const [isLoading, setIsLoading] = useState(true);
   const [toastProps, setToastProps] = useState(emptyToastProps);
   const fetch = useAuthenticatedFetch();
@@ -26,7 +26,7 @@ export function ProductsCard() {
       onSuccess: () => {
         setIsLoading(false);
       },
-    }
+    },
   });
 
   const toastMarkup = toastProps.content && !isRefetchingCount && (

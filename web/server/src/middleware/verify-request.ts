@@ -3,8 +3,8 @@ import ensureBilling from "../helpers/ensure-billing";
 import redirectToAuth from "../helpers/redirect-to-auth";
 
 import returnTopLevelRedirection from "../helpers/return-top-level-redirection";
-import {NextFunction, Request, Response, Application} from "express";
-import {BillingError} from "@shopify/shopify-api/dist/error";
+import { NextFunction, Request, Response, Application } from "express";
+import { BillingError } from "@shopify/shopify-api/dist/error";
 
 const TEST_GRAPHQL_QUERY = `
 {
@@ -37,8 +37,8 @@ export default function verifyRequest(
 
           const [hasPayment, confirmationUrl] = await ensureBilling(
             session,
-              // @ts-ignore
-              billing
+            // @ts-ignore
+            billing
           );
 
           if (!hasPayment) {
@@ -87,7 +87,7 @@ export default function verifyRequest(
     returnTopLevelRedirection(
       req,
       res,
-        // @ts-ignore
+      // @ts-ignore
       `/api/auth?shop=${encodeURIComponent(shop)}`
     );
   };
