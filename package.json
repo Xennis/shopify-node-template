@@ -15,5 +15,8 @@
     "@shopify/app": "3.10.1",
     "@shopify/cli": "3.10.1"
   },
-  "author": "fabian"
+  "author": "fabian",
+  "devDependencies": {
+    "prettier": "^2.7.1"
+  }
 }

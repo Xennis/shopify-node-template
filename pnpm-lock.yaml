@@ -3,10 +3,14 @@ lockfileVersion: 5.4
 specifiers:
   '@shopify/app': 3.10.1
   '@shopify/cli': 3.10.1
+  prettier: ^2.7.1
 
 dependencies:
   '@shopify/app': 3.10.1_graphql-tag@2.12.6
   '@shopify/cli': 3.10.1
+
+devDependencies:
+  prettier: 2.7.1
 
 packages:
 
@@ -2446,7 +2450,6 @@ packages:
     resolution: {integrity: sha512-ujppO+MkdPqoVINuDFDRLClm7D78qbDt0/NR+wp5FqEZOoTNAjPHWj17QRhu7geIHJfcNhRk1XVQmF8Bp3ye+g==}
     engines: {node: '>=10.13.0'}
     hasBin: true
-    dev: false
 
   /printable-characters/1.0.42:
     resolution: {integrity: sha512-dKp+C4iXWK4vVYZmYSd0KBH5F/h1HoZRsbJ82AVKRO3PEo8L4lBS/vLwhVtpwwuYcoIsVY+1JYKR268yn480uQ==}
