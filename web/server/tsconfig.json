@@ -16,6 +16,6 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["helpers", "middleware"],
+  "include": ["scr"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
