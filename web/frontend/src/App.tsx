@@ -1,19 +1,19 @@
 import { BrowserRouter } from "react-router-dom";
 import { NavigationMenu } from "@shopify/app-bridge-react";
-import Routes from "./Routes";
+import { Routes, Route } from "react-router-dom";
+
 
 import {
   AppBridgeProvider,
   QueryProvider,
   PolarisProvider,
 } from "./components";
+import HomePage from "./pages";
+import ExitIframe from "./pages/ExitIframe";
+import NotFound from "./pages/NotFound";
+import PageName from "./pages/pagename";
 
 export default function App() {
-  // Any .tsx or .jsx files in /pages will become a route
-  // See documentation for <Routes /> for more info
-  // @ts-ignore
-  const pages = import.meta.globEager("./pages/**/!(*.test.[jt]sx)*.([jt]sx)");
-
   return (
     <PolarisProvider>
       <BrowserRouter>
@@ -27,7 +27,12 @@ export default function App() {
                 },
               ]}
             />
-            <Routes pages={pages} />
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/exitIframe" element={<ExitIframe />} />
+              <Route path="/pagename" element={<PageName />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
           </QueryProvider>
         </AppBridgeProvider>
       </BrowserRouter>
